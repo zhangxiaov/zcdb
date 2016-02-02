@@ -14,7 +14,9 @@
 #include "ZMap.h"
 #include "ZFile.h"
 #include "CString.h"
+#include "ZSearch.h"
 
+// value = fileData
 static ZMap* tablesMap = NULL;
 static char* dbDirPath = NULL;
 static const char* tableDirName = "table";
@@ -32,6 +34,16 @@ struct zdb {
     int fileCount;
     ulong globalID; //atomic
     struct zdbFile* files;
+};
+
+struct zdbtable {
+    ulong size;
+    ulong* data;
+};
+
+struct zdbrecyclebin {
+    ulong rid;
+    char* data;
 };
 
 static struct zdb db;
@@ -89,19 +101,112 @@ void zdbatomic() {
 }
 
 
+//table data 有序
+//========================================================
 //读取 table文件，文件内存recordID，每个ID8 byte，dir ： tables
-ZMap* zdbTablesInit() {
+// 此用于重启读取table文件名
+ZMap* zdbTableInit() {
     if (dbDirPath == NULL || strlen(dbDirPath) == 0) {
         throw("dbDir is NULL");
     }
     
-    ZArray* names = zfileNamesByPath(csAppend(dbDirPath, tableDirName));
+    char* tableDirPath = csPathAppendComponent(dbDirPath, tableDirName);
+    ZArray* names = zfileNamesByPath(tableDirPath);
     tablesMap = zmapInit();
     int count = names->len;
     for (int i = 0; i < count; i++) {
         char* table_name = zarrayGet(names, i);
-        zmapPut(tablesMap, table_name, table_name);
+        struct zdbtable t;
+        t.data = (ulong*)zfileReadAllData(csPathAppendComponent(tableDirPath, table_name), &t.size);
+        t.size = t.size/8;
+        zmapPut(tablesMap, table_name, &t);
     }
     
     return tablesMap;
 }
+
+//通过后台建新表
+ZMap* zdbTableCreate(char* tableName) {
+    if (dbDirPath == NULL || strlen(dbDirPath) == 0) {
+        throw("dbDir is NULL");
+    }
+    
+    if (tablesMap == NULL) {
+        tablesMap = zmapInit();
+    }
+    
+    zmapPut(tablesMap, tableName, NULL);
+    return tablesMap;
+}
+
+
+//get count data
+//ulong* zdbTableDataGet(char* tableName, int start, int count) {
+//    struct zdbtable* t = (struct zdbtable*)zmapGet(tablesMap, tableName);
+//    
+//}
+
+// when insert new record
+void zdbTableDataAppend(char* tableName, ulong rid) {
+    struct zdbtable* t = (struct zdbtable*)zmapGet(tablesMap, tableName);
+    ulong* oldData = t->data;
+    ulong* newData = (ulong*)malloc((t->size+1)*8);
+    memcpy(newData, oldData, t->size*8);
+    memcpy(newData+t->size*8, &rid, 8);
+    ++t->size;
+    
+    free(oldData);
+}
+
+// when del record
+void zdbTableDataDel(char* tableName, ulong rid) {
+    //二分查找 rid
+    struct zdbtable* t = (struct zdbtable*)zmapGet(tablesMap, tableName);
+    int index = zbinarySearchForUlong(t->data, rid, 0, (int)t->size-1);
+    if (index < 0) {
+        return;
+    }
+    
+    ulong* oldData = t->data;
+    ulong* newData = (ulong*)malloc((t->size-1)*8);
+    memcpy(newData, oldData, index*8);
+    memcpy(newData+index*8, oldData+(index+1)*8, (t->size-index-1)*8);
+    --t->size;
+    
+    free(oldData);
+}
+
+// when record from recycle bin return
+void zdbTableDataInsert(char* tableName, struct zdbrecyclebin rb) {
+    struct zdbtable* t = (struct zdbtable*)zmapGet(tablesMap, tableName);
+    
+    int index = zbinarySearchForOutterUnlong(t->data, rb.rid, 0, (int)t->size - 1);
+    
+    ulong* oldData = t->data;
+    ulong* newData = (ulong*)malloc((t->size+1)*8);
+    memcpy(newData, oldData, index*8);
+    memcpy(newData+index+index*8, oldData, size_t);
+    
+}
+
+//write to hd
+void zdbTableDataflush(char* tableName) {
+    
+}
+
+//index
+//=====================================
+//此重启时用
+
+
+
+
+
+
+
+
+
+
+
+
+

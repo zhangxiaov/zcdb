@@ -174,6 +174,42 @@ char* csAppendChar(char* self, char ch) {
     return newS;
 }
 
+
+//copy "/"
+char* csPathAppendComponent(const char* self, const char* str) {
+    size_t selfLen = 0;
+    if (self != NULL) {
+        selfLen = strlen(self);
+    }
+    size_t strLen = 0;
+    if (str != NULL) {
+        strLen = strlen(str);
+    }
+    
+    char* newS = (char*)malloc(selfLen + strLen + 1 + 1);
+    if (newS == NULL) {
+        printf("malloc no mem");
+        return NULL;
+    }
+    
+    void* temp = newS;
+    
+    for (int i = 0; i < selfLen; i++) {
+        *newS++ = *self++;
+    }
+    
+    *newS++ = '/';
+    
+    for (int i = 0; i < strLen; i++) {
+        *newS++ = *str++;
+    }
+    
+    *newS = '\0';
+    
+    return temp;
+
+}
+
 //copy
 char* csAppend(const char* self, const char* str) {
     size_t selfLen = 0;

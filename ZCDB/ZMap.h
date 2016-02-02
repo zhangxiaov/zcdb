@@ -40,4 +40,6 @@ void zmapPut(ZMap* self, char* key, void* val);
 void* zmapGet(ZMap* self, char* key);
 char* zmapToString(ZMap* self);
 
+void zmapSet(ZMap* self, char* key, void* val);
+
 #endif /* defined(__oc_demo__ZMap__) */

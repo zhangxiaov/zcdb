@@ -51,6 +51,7 @@ ZMap* zmapInitWithKV(int n, char* key,...) {
     return map;
 }
 
+//
 void zmapPut(ZMap* self, char* key, void* val) {
     if (self == NULL || key == NULL) {
         return;
@@ -80,6 +81,40 @@ void zmapPut(ZMap* self, char* key, void* val) {
         if (csIsEqual(key, node->key)) {
             node->val = val;
 
+            return;
+        }
+        if (node->next == NULL) {
+            zmapNode* newNode = (zmapNode*)malloc(sizeof(zmapNode));
+            newNode->key = key;
+            newNode->val = val;
+            newNode->next = NULL;
+            node->next = newNode;
+            
+            return;
+        }
+    }
+}
+
+//修改value
+void zmapSet(ZMap* self, char* key, void* val) {
+    if (self == NULL || key == NULL) {
+        return;
+    }
+    
+    uint64_t h = zhashCode(key, strlen(key));
+    int index = (int)(h % self->size);
+    
+    zmapNode* node = self->data + index;
+    for (; node != NULL; node = node->next) {
+        if (node->key == NULL) {
+            node->key = key;
+            node->val = val;
+            
+            return;
+        }
+        if (csIsEqual(key, node->key)) {
+            node->val = val;
+            
             return;
         }
         if (node->next == NULL) {

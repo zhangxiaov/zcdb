@@ -30,4 +30,7 @@ bool csIsPrefix(char* self, char* prefix);
 char* csSeparateToEnd(char* self, char* c);
 char* csSeparateFromBegin(char* self, char* c);
 
+
+char* csPathAppendComponent(const char* self, const char* str);
+
 #endif /* CString_h */

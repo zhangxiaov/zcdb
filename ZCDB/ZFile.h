@@ -11,9 +11,10 @@
 
 #include <stdio.h>
 #include "ZC.h"
+#include "ZArray.h"
 
 ZArray* zfileNamesByPath(char* dirPath);
-
+char* zfileReadAllData(char* filePath, ulong* size);
 //void zfileCreate(char* fileName);
 //
 ////读取len子节
