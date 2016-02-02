@@ -185,8 +185,10 @@ void zdbTableDataInsert(char* tableName, struct zdbrecyclebin rb) {
     ulong* oldData = t->data;
     ulong* newData = (ulong*)malloc((t->size+1)*8);
     memcpy(newData, oldData, index*8);
-    memcpy(newData+index+index*8, oldData, size_t);
+    memcpy(newData+index+index*8, oldData+index*8, (t->size-index)*8);
+    ++t->size;
     
+    free(oldData);
 }
 
 //write to hd
