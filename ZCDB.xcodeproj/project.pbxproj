@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		EDAAF9A31C609AE40093DA95 /* ZSearch.c in Sources */ = {isa = PBXBuildFile; fileRef = EDAAF9A11C609AE40093DA95 /* ZSearch.c */; };
 		EDE85E641C5F9A740073C013 /* CString.c in Sources */ = {isa = PBXBuildFile; fileRef = EDE85E341C5F9A740073C013 /* CString.c */; };
 		EDE85E6E1C5F9A740073C013 /* ZArray.c in Sources */ = {isa = PBXBuildFile; fileRef = EDE85E461C5F9A740073C013 /* ZArray.c */; };
 		EDE85E6F1C5F9A740073C013 /* ZC.c in Sources */ = {isa = PBXBuildFile; fileRef = EDE85E481C5F9A740073C013 /* ZC.c */; };
@@ -41,6 +42,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		EDAAF9A11C609AE40093DA95 /* ZSearch.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ZSearch.c; sourceTree = "<group>"; };
+		EDAAF9A21C609AE40093DA95 /* ZSearch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZSearch.h; sourceTree = "<group>"; };
 		EDE85E291C5F9A360073C013 /* ZCDB */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ZCDB; sourceTree = BUILT_PRODUCTS_DIR; };
 		EDE85E341C5F9A740073C013 /* CString.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = CString.c; sourceTree = "<group>"; };
 		EDE85E351C5F9A740073C013 /* CString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CString.h; sourceTree = "<group>"; };
@@ -152,6 +155,8 @@
 				EDE85E631C5F9A740073C013 /* ZTime.h */,
 				EDE85E801C5F9B350073C013 /* ZDB2.c */,
 				EDE85E811C5F9B350073C013 /* ZDB2.h */,
+				EDAAF9A11C609AE40093DA95 /* ZSearch.c */,
+				EDAAF9A21C609AE40093DA95 /* ZSearch.h */,
 			);
 			name = utils;
 			sourceTree = "<group>";
@@ -214,6 +219,7 @@
 			files = (
 				EDE85E761C5F9A740073C013 /* ZIndex.c in Sources */,
 				EDE85E701C5F9A740073C013 /* ZDB.c in Sources */,
+				EDAAF9A31C609AE40093DA95 /* ZSearch.c in Sources */,
 				EDE85E7D1C5F9A740073C013 /* ZTime.c in Sources */,
 				EDE85E731C5F9A740073C013 /* ZFile.c in Sources */,
 				EDE85E7A1C5F9A740073C013 /* ztcpServerStart.c in Sources */,
@@ -349,6 +355,7 @@
 				EDE85E321C5F9A360073C013 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
