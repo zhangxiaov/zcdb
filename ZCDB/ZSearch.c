@@ -18,3 +18,8 @@ int zbinarySearchForOutterUnlong(ulong data[], ulong theData, int start, int end
     
     return 0;
 }
+
+int zbinarySearchForString(char* data, char* theData, int start, int end , int charSize) {
+    
+    return 0;
+}

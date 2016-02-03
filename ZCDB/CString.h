@@ -19,8 +19,7 @@ char* csAppend(const char* self, const char* str);
 char* csAppendInt(char* self, int intVal);
 char* csAppendChar(char* self, char c);
 char* csIntToString(int intVal);
-bool csIsEqual(char* self, char* str);
-
+bool csIsEqual(const char* self,const char* str);
 int csToInt(char* self);
 
 //是前缀否
@@ -32,5 +31,8 @@ char* csSeparateFromBegin(char* self, char* c);
 
 
 char* csPathAppendComponent(const char* self, const char* str);
+
+// aaaaabag xxxxxx fasfdf
+char* csSearchLikeByCVC(char* self, char* constant1, int variableMaxSize, char** constant2);
 
 #endif /* CString_h */

@@ -5,21 +5,39 @@
 //  Created by 张新伟 on 16/2/1.
 //  Copyright © 2016年 张新伟. All rights reserved.
 //
+//一目录db 下table目录。table目录下 有indexID indexVal目录，其他的就是db文件
 
-// db --file1,file2,file3
-//      table--t_user,t_class
-//      index-- i_age
 #include "ZDB2.h"
 #include "ZJson.h"
 #include "ZMap.h"
 #include "ZFile.h"
 #include "CString.h"
 #include "ZSearch.h"
+#include "ZSort.h"
 
 // value = fileData
+// 索引 字段 <＝ 11byte
 static ZMap* tablesMap = NULL;
 static char* dbDirPath = NULL;
 static const char* tableDirName = "table";
+static const char* indexIDDirName = "indexID";
+static const char* indexValDirName = "indexVal";
+static const char* indexTypeText = "Text";
+static const char* indexTypeNumber = "Number";
+
+struct zindex {
+    ulong rcount;
+    ulong* ridData;
+    char* valData;
+    char* indexName;
+    char* indexType;
+    struct zindex* next;
+};
+
+struct zdbIndexInfo {
+    ulong indexCount;
+    struct zindex* indexs;
+};
 
 struct zdbFile {
     void* ptr;
@@ -39,6 +57,7 @@ struct zdb {
 struct zdbtable {
     ulong size;
     ulong* data;
+    struct zdbIndexInfo indexInfo;
 };
 
 struct zdbrecyclebin {
@@ -46,9 +65,12 @@ struct zdbrecyclebin {
     char* data;
 };
 
+
+
 static struct zdb db;
 
 void zdbatomic();
+void zdbTableDataAppend(char* tableName, ulong rid);
 
 
 // {"table":"t_user", "name":"zhangxinwei", "age":26, "class":{"class_id":"11", "class_name":"xxxxxx"}}
@@ -79,6 +101,7 @@ ulong zdbInsert(char* jsonStr) {
             }
             memcpy(f->ptr+offset, jsonStr, jLen);
             ++db.globalID;
+            zdbTableDataAppend(table_name, db.globalID);
             break;
         }
     }
@@ -86,7 +109,28 @@ ulong zdbInsert(char* jsonStr) {
     //索引
     
     
-    return 0;
+    return db.globalID;
+}
+
+
+//
+char* zdbSelectOne(ulong rid) {
+    char* val = NULL;
+    if (tablesMap == NULL) {
+        throw("tablesMap need init");
+    }
+    
+    size_t size = sizeof(struct zdbFile);
+    for (int i = 0; i < db.fileCount; i++) {
+        struct zdbFile* f = (struct zdbFile*)(db.files + i*size);
+        if (rid < f->recordEndID) {
+            ulong offset = rid*f->recordSize;
+            val = f->ptr+offset;
+            break;
+        }
+    }
+    
+    return val;
 }
 
 void zdbatomic() {
@@ -199,8 +243,141 @@ void zdbTableDataflush(char* tableName) {
 //index
 //=====================================
 //此重启时用
+void zdbIndexInit(char* tableName) {
+    if (dbDirPath == NULL || strlen(dbDirPath) == 0) {
+        throw("dbDir is NULL");
+    }
+    
+    char* iddirpath = csPathAppendComponent(csPathAppendComponent(dbDirPath, tableName), indexIDDirName);
+    char* valdirpath = csPathAppendComponent(csPathAppendComponent(dbDirPath, tableName), indexValDirName);
+    struct zdbtable* t =  (struct zdbtable*)zmapGet(tablesMap, tableName);
 
+    //ID
+    ZArray* names = zfileNamesByPath(iddirpath);
+    int count = names->len;
+    
+    struct zdbIndexInfo indexInfo;
+    indexInfo.indexCount = count;
+    indexInfo.indexs = NULL;
+    
+    t->indexInfo = indexInfo;
+    
+    for (int i = 0; i < count; i++) {
+        struct zindex* index = indexInfo.indexs;
+        if (index == NULL) {
+            index = (struct zindex*)malloc(sizeof(struct zindex));
+            char* indexidFileName = zarrayGet(names, i);
+            index->indexName = indexidFileName;
+            index->ridData = (ulong*)zfileReadAllData(csPathAppendComponent(iddirpath, indexidFileName), &index->rcount);
+            index->valData = zfileReadAllData(csPathAppendComponent(valdirpath, indexValDirName), 0);
+            index->rcount = index->rcount/8;
+            index->next = NULL;
+        }else {
+            struct zindex* indexMid = (struct zindex*)malloc(sizeof(struct zindex));
+            indexMid->next = index;
+            char* indexidFileName = zarrayGet(names, i);
+            indexMid->indexName = indexidFileName;
+            indexMid->ridData = (ulong*)zfileReadAllData(csPathAppendComponent(iddirpath, indexidFileName), &indexMid->rcount);
+            indexMid->valData = zfileReadAllData(csPathAppendComponent(valdirpath, indexValDirName), 0);
+            indexMid->rcount = indexMid->rcount/8;
+            
+            indexInfo.indexs = indexMid;
+        }
+    }
+}
 
+//后台
+// db/table/indexID
+bool zdbIndexCreate(char* tableName, char* indexName, char* indexType) {
+    if (indexType == NULL) {
+        return false;
+    }
+    
+    struct zdbtable* t =  (struct zdbtable*)zmapGet(tablesMap, tableName);
+    struct zdbIndexInfo info = t->indexInfo;
+    struct zindex* p = (struct zindex*)malloc(sizeof(struct zindex));
+    
+    char* tableDirPath = csPathAppendComponent(dbDirPath, tableDirName);
+    char* id_filePath = csPathAppendComponent(tableDirPath, indexIDDirName);
+    char* val_filePath = csPathAppendComponent(tableDirPath, indexValDirName);
+    
+    //1 create index file
+    if(!zfileCreateFileWithName(id_filePath)) {
+        return false;
+    }
+    if (!zfileCreateFileWithName(val_filePath)) {
+        return false;
+    }
+    
+    
+    //2 fill index file from table rid
+    //此步耗时
+    ulong* ridData = t->data;
+    int size = (int)t->size;
+    char* c1 = csAppend(indexName, "\":");
+    char c2[][2] = {",", "}"};
+    char* data = (char*)malloc(11*size);
+    for (int i = 0; i < size; i++) {
+        ulong rid = *(ridData+i*8);
+        char* val = csSearchLikeByCVC(zdbSelectOne(rid), c1, 11, c2);
+        memcpy(data+i*11, val, sizeof(val));
+    }
+    
+    if (csIsEqual(indexType, indexTypeNumber)) {
+        //排序
+        zsortByShellForPair(ridData, data, 11*size);
+    }else if (csIsEqual(indexType, indexTypeText)) {
+        //值 按 字符串排序
+        
+    }
+    
+    p->indexName = indexName;
+    p->indexType = indexType;
+    p->ridData = ridData;
+    p->valData = data;
+    p->rcount = size;
+    p->next = info.indexs;
+    info.indexs = p;
+
+    //end
+    
+    return false;
+}
+
+//索引追加 皆排序
+// when insert
+void zdbIndexDataAppend(char* tableName, char* indexName, ulong rid, char* val) {
+    struct zdbtable* t =  (struct zdbtable*)zmapGet(tablesMap, tableName);
+    struct zdbIndexInfo info = t->indexInfo;
+    
+    struct zindex* p;
+    p = info.indexs;
+    while (p) {
+        if (csIsEqual(p->indexName, indexName)) {
+            int count = (int)p->rcount;
+            int index = zbinarySearchForString(p->valData, val, 0, count, 11);
+            
+            ulong* oldIDData = p->ridData;
+            char* oldValData = p->valData;
+            ulong* newIDData = (ulong*)malloc((p->rcount+1)*8);
+            char* newValData = (char*)malloc((p->rcount+1)*11);
+            
+            memcpy(newIDData, oldIDData, index*8);
+            memcpy(newIDData+index+index*8, oldIDData+index*8, (p->rcount-index)*8);
+            
+            memcpy(newValData, oldValData, index*11);
+            memcpy(newValData+index+index*11, oldValData+index*11, (p->rcount-index)*11);
+            
+            free(oldIDData);
+            free(oldValData);
+            
+            ++p->rcount;
+            break;
+        }
+        
+        p = p->next;
+    }
+}
 
 
 

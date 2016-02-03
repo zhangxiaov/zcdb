@@ -90,7 +90,7 @@ label:
     return -1;
 }
 
-bool csIsEqual(char* self, char* str) {
+bool csIsEqual(const char* self,const char* str) {
     if (self == NULL || str == NULL) {
         return false;
     }
@@ -350,6 +350,13 @@ char* csSeparateFromBegin(char* self, char* c) {
 
 void test () {
     int test = 12306;
+}
+
+
+
+char* csSearchLikeByCVC(char* self, char* constant1, int variableMaxSize, char** constant2) {
+
+    return NULL;
 }
 
 void main_cstring() {

@@ -15,6 +15,9 @@
 
 ZArray* zfileNamesByPath(char* dirPath);
 char* zfileReadAllData(char* filePath, ulong* size);
+
+bool zfileCreateFileWithName(char* name);
+
 //void zfileCreate(char* fileName);
 //
 ////读取len子节
