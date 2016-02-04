@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		EDAAF9A31C609AE40093DA95 /* ZSearch.c in Sources */ = {isa = PBXBuildFile; fileRef = EDAAF9A11C609AE40093DA95 /* ZSearch.c */; };
 		EDAAF9A61C61F3DC0093DA95 /* ZSort.c in Sources */ = {isa = PBXBuildFile; fileRef = EDAAF9A41C61F3DC0093DA95 /* ZSort.c */; };
+		EDAAF9AA1C634D930093DA95 /* test.c in Sources */ = {isa = PBXBuildFile; fileRef = EDAAF9A81C634D930093DA95 /* test.c */; };
 		EDE85E641C5F9A740073C013 /* CString.c in Sources */ = {isa = PBXBuildFile; fileRef = EDE85E341C5F9A740073C013 /* CString.c */; };
 		EDE85E6E1C5F9A740073C013 /* ZArray.c in Sources */ = {isa = PBXBuildFile; fileRef = EDE85E461C5F9A740073C013 /* ZArray.c */; };
 		EDE85E6F1C5F9A740073C013 /* ZC.c in Sources */ = {isa = PBXBuildFile; fileRef = EDE85E481C5F9A740073C013 /* ZC.c */; };
@@ -46,6 +47,8 @@
 		EDAAF9A21C609AE40093DA95 /* ZSearch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZSearch.h; sourceTree = "<group>"; };
 		EDAAF9A41C61F3DC0093DA95 /* ZSort.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ZSort.c; sourceTree = "<group>"; };
 		EDAAF9A51C61F3DC0093DA95 /* ZSort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZSort.h; sourceTree = "<group>"; };
+		EDAAF9A81C634D930093DA95 /* test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test.c; sourceTree = "<group>"; };
+		EDAAF9A91C634D930093DA95 /* test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = test.h; sourceTree = "<group>"; };
 		EDE85E291C5F9A360073C013 /* ZCDB */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ZCDB; sourceTree = BUILT_PRODUCTS_DIR; };
 		EDE85E341C5F9A740073C013 /* CString.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = CString.c; sourceTree = "<group>"; };
 		EDE85E351C5F9A740073C013 /* CString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CString.h; sourceTree = "<group>"; };
@@ -93,6 +96,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		EDAAF9A71C634D740093DA95 /* goroutine */ = {
+			isa = PBXGroup;
+			children = (
+				EDAAF9A81C634D930093DA95 /* test.c */,
+				EDAAF9A91C634D930093DA95 /* test.h */,
+			);
+			path = goroutine;
+			sourceTree = "<group>";
+		};
 		EDE85E201C5F9A360073C013 = {
 			isa = PBXGroup;
 			children = (
@@ -121,6 +133,7 @@
 		EDE85E331C5F9A3F0073C013 /* utils */ = {
 			isa = PBXGroup;
 			children = (
+				EDAAF9A71C634D740093DA95 /* goroutine */,
 				EDE85E341C5F9A740073C013 /* CString.c */,
 				EDE85E351C5F9A740073C013 /* CString.h */,
 				EDE85E461C5F9A740073C013 /* ZArray.c */,
@@ -232,6 +245,7 @@
 				EDE85E821C5F9B350073C013 /* ZDB.c in Sources */,
 				EDE85E641C5F9A740073C013 /* CString.c in Sources */,
 				EDE85E711C5F9A740073C013 /* ZDict.c in Sources */,
+				EDAAF9AA1C634D930093DA95 /* test.c in Sources */,
 				EDE85E7B1C5F9A740073C013 /* ztcpServerUtils.c in Sources */,
 				EDE85E7F1C5F9AE70073C013 /* main.c in Sources */,
 				EDE85E741C5F9A740073C013 /* ZHash.c in Sources */,

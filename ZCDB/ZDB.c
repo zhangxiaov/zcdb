@@ -5,7 +5,6 @@
 //  Created by 张新伟 on 16/2/1.
 //  Copyright © 2016年 张新伟. All rights reserved.
 //
-//一目录db 下table目录。table目录下 有indexID indexVal目录，其他的就是db文件
 
 #include "ZDB.h"
 #include "ZJson.h"
@@ -107,7 +106,12 @@ ulong zdbInsert(char* jsonStr) {
     }
     
     //索引
-    
+    struct zdbtable* t = (struct zdbtable*)zmapGet(tablesMap, table_name);
+    struct zdbIndexInfo info = t->indexInfo;
+    int indexCount = (int)info.indexCount;
+    for (int i = 0; i < indexCount; i++) {
+        
+    }
     
     return db.globalID;
 }
