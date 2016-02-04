@@ -110,7 +110,11 @@ ulong zdbInsert(char* jsonStr) {
     struct zdbIndexInfo info = t->indexInfo;
     int indexCount = (int)info.indexCount;
     for (int i = 0; i < indexCount; i++) {
-        
+        char* indexName = info.indexs->indexName;
+        char* val = zmapGet(map, indexName);
+        if (val != NULL) {
+            zdbIndexDataAppend(table_name, indexName, db.globalID, val);
+        }
     }
     
     return db.globalID;
@@ -358,7 +362,7 @@ void zdbIndexDataAppend(char* tableName, char* indexName, ulong rid, char* val) 
     while (p) {
         if (csIsEqual(p->indexName, indexName)) {
             int count = (int)p->rcount;
-            int index = zbinarySearchForString(p->valData, val, 0, count, 11);
+            int index = zbinarySearchNearPosForString(p->valData, val, 0, count, 11);
             
             ulong* oldIDData = p->ridData;
             char* oldValData = p->valData;
