@@ -32,7 +32,12 @@ char* csSeparateFromBegin(char* self, char* c);
 
 char* csPathAppendComponent(const char* self, const char* str);
 
-// aaaaabag xxxxxx fasfdf
-char* csSearchLikeByCVC(char* self, char* constant1, int variableMaxSize, char** constant2);
 
+//
+char* csSearchValByCVCForJson(char* self, char* key, int variableMaxSize);
+
+//constant2 可能是个数组 是xx或是cc 返回variable的内容
+char* csSearchLikeByCVC(char* self, char* constant1, int variableMaxSize, void* constant2);
+
+char* csSearchValByCVCForJson(char* self, char* key, int variableMaxSize);
 #endif /* CString_h */

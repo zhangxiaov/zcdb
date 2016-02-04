@@ -348,13 +348,36 @@ char* csSeparateFromBegin(char* self, char* c) {
     return csSliceByEndByteIndex(self, charIndex, 0);
 }
 
-void test () {
-    int test = 12306;
+
+//{"name":"zhangxinwei"}
+char* csSearchValByCVCForJson(char* self, char* key, int variableMaxSize) {
+    char* val = NULL;
+    size_t selfLen = strlen(self);
+    size_t len = strlen(key);
+    int index = csSearch(self, csAppend(key, "\":"));
+    char c = self[index+len+2];
+    if (c == '\"') {
+        for (int i = index+len+2; i < selfLen && i <  index+len+2+variableMaxSize; i++) {
+            char c_temp = self[i];
+            if (c_temp == '\"') {
+                val = (char*)malloc(i - index - len - 2);
+                return val;
+            }
+        }
+    }else {
+        for (int i = index+len+2; i < selfLen && i <  index+len+2+variableMaxSize; i++) {
+            char c_temp = self[i];
+            if (c_temp == ',' || c_temp == '}') {
+                val = (char*)malloc(i - index - len - 2);
+                return val;
+            }
+        }
+    }
+    
+    return val;
 }
 
-
-
-char* csSearchLikeByCVC(char* self, char* constant1, int variableMaxSize, char** constant2) {
+char* csSearchLikeByCVC(char* self, char* constant1, int variableMaxSize, void* constant2) {
 
     return NULL;
 }

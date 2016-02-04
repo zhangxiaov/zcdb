@@ -8,4 +8,12 @@
 
 #include "ZC.h"
 
-void zsortByShellForPair(ulong* ridData, char* valData, int size);
+void zsortForStringPairAsString(ulong* id, void* data, int left, int right);
+
+void zsortForStringPairAsNumber(void* id, void* data, int left, int right);
+
+//quicksort for string as num
+void zsortForStringAsNumber(void* data, int left, int right);
+
+//quicksort for string as string
+void zsortForStringAsString(void* data, int left, int right);

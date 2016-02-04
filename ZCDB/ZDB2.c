@@ -314,21 +314,21 @@ bool zdbIndexCreate(char* tableName, char* indexName, char* indexType) {
     //此步耗时
     ulong* ridData = t->data;
     int size = (int)t->size;
-    char* c1 = csAppend(indexName, "\":");
-    char c2[][2] = {",", "}"};
-    char* data = (char*)malloc(11*size);
+    char* data = (char*)malloc(12*size);
+    memset(data, 0, 12*size);
+    
     for (int i = 0; i < size; i++) {
         ulong rid = *(ridData+i*8);
-        char* val = csSearchLikeByCVC(zdbSelectOne(rid), c1, 11, c2);
-        memcpy(data+i*11, val, sizeof(val));
+        char* val = csSearchValByCVCForJson(zdbSelectOne(rid), indexName, 11);
+        memcpy(data+i*12, val, 11);
     }
     
     if (csIsEqual(indexType, indexTypeNumber)) {
-        //排序
-        zsortByShellForPair(ridData, data, 11*size);
+        //按 数字 排序
+        zsortForStringPairAsNumber(ridData, data, 0, size-1);
     }else if (csIsEqual(indexType, indexTypeText)) {
         //值 按 字符串排序
-        
+        zsortForStringPairAsString(ridData, data, 0, size-1);
     }
     
     p->indexName = indexName;
@@ -344,8 +344,7 @@ bool zdbIndexCreate(char* tableName, char* indexName, char* indexType) {
     return false;
 }
 
-//索引追加 皆排序
-// when insert
+//索引追加 皆排序 when insert
 void zdbIndexDataAppend(char* tableName, char* indexName, ulong rid, char* val) {
     struct zdbtable* t =  (struct zdbtable*)zmapGet(tablesMap, tableName);
     struct zdbIndexInfo info = t->indexInfo;
